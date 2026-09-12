@@ -3,367 +3,897 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loja de Calçados</title>
+    <title>Ponto Eletrônico Inteligente</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
-            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            margin-bottom: 30px;
-            border-radius: 5px;
-        }
-        .products {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-        .product {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-        .product:hover {
-            transform: translateY(-5px);
-        }
-        .product img {
             width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 5px;
+            max-width: 950px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 20px;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .form-group {
             margin-bottom: 15px;
         }
-        .product h3 {
-            margin: 0 0 10px 0;
-            color: #4CAF50;
-            font-size: 1.3em;
-        }
-        .product p {
-            margin: 8px 0;
-            color: #555;
-        }
-        .price {
-            font-weight: bold;
-            color: #e91e63;
-            font-size: 1.3em;
-            margin: 10px 0;
-        }
-        .select-group {
-            margin: 15px 0;
-        }
+
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             font-weight: 600;
-        }
-        select, input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            color: var(--text-light);
             font-size: 14px;
         }
-        select {
+
+        input, select {
             width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
         }
-        .quantity {
-            width: 60px;
+
+        input:focus, select:focus {
+            border-color: var(--primary);
         }
-        .checkout-btn {
-            display: block;
-            width: 250px;
-            margin: 40px auto;
-            padding: 15px;
-            background-color: #25D366;
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
             color: white;
-            text-align: center;
             border: none;
-            border-radius: 50px;
-            font-size: 18px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--text-light);
+            margin-top: 10px;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .link-action {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .link-action:hover {
+            text-decoration: underline;
+        }
+
+        /* Painel de Ponto */
+        .clock-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            color: var(--primary);
+            margin: 15px 0;
+        }
+
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-ponto {
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-entrada { background-color: var(--success); }
+        .btn-almoco-saida { background-color: var(--warning); }
+        .btn-almoco-volta { background-color: #3b82f6; }
+        .btn-saida { background-color: var(--danger); }
+
+        .btn-ponto:hover { opacity: 0.9; }
+
+        /* Tabelas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .badge {
+            background-color: #e0e7ff;
+            color: var(--primary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .alert {
+            padding: 10px;
+            background-color: #fee2e2;
+            color: var(--danger);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
             font-weight: bold;
             cursor: pointer;
-            text-decoration: none;
-            transition: background-color 0.3s;
+            padding: 8px 16px;
+            border-radius: 6px;
+            width: auto;
         }
-        .checkout-btn:hover {
-            background-color: #128C7E;
-        }
-        .cart-summary {
-            background-color: white;
-            padding: 25px;
-            border-radius: 8px;
-            margin-top: 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .product-number {
-            background-color: #4CAF50;
+
+        .tab-btn.active {
+            background-color: var(--primary);
             color: white;
-            padding: 3px 10px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            display: inline-block;
-            margin-bottom: 10px;
+        }
+
+        .codigo-destaque {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--success);
+            text-align: center;
+            margin: 10px 0;
+            letter-spacing: 5px;
+        }
+
+        /* Estilo específico para impressão */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+                padding: 20px;
+                box-shadow: none;
+                border: none;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Loja de Calçados</h1>
-            <p>Escolha o modelo e tamanho, e envie seu pedido pelo WhatsApp</p>
-        </div>
-    </header>
 
     <div class="container">
-        <div class="products">
-            <!-- Calçado 1 -->
-            <div class="product">
-                <div class="product-number">#TÊN-001</div>
-                <img src="https://via.placeholder.com/300x200?text=Tênis+Esportivo" alt="Tênis Esportivo">
-                <h3>Tênis Esportivo</h3>
-                <p>Tênis confortável para corrida e atividades físicas</p>
-                <p class="price">R$ 199,90</p>
-                
-                <div class="select-group">
-                    <label for="size1">Tamanho:</label>
-                    <select id="size1">
-                        <option value="">Selecione</option>
-                        <option value="36">36</option>
-                        <option value="37">37</option>
-                        <option value="38">38</option>
-                        <option value="39">39</option>
-                        <option value="40">40</option>
-                        <option value="41">41</option>
-                        <option value="42">42</option>
-                        <option value="43">43</option>
-                        <option value="44">44</option>
-                    </select>
+        
+        <!-- TELA DE LOGIN -->
+        <div id="login-screen" class="card">
+            <h1>Ponto Eletrônico</h1>
+            <p style="text-align: center; color: var(--text-light); margin-bottom: 20px;">Digite seu CPF ou Código de 3 dígitos</p>
+            <div id="login-error" class="alert hidden">Credencial não encontrada ou inválida.</div>
+            
+            <div class="form-group">
+                <label for="acesso-login">CPF ou Código</label>
+                <input type="text" id="acesso-login" placeholder="Ex: 000.000.000-00 ou 482" style="text-align: center; font-size: 18px;" oninput="tratarInputLogin(this)">
+            </div>
+            <button onclick="realizarLogin()">Entrar no Sistema</button>
+            
+            <div class="link-action" onclick="mostrarTelaCadastro()">Não tem cadastro? Cadastre-se aqui</div>
+        </div>
+
+        <!-- TELA DE CADASTRO -->
+        <div id="register-screen" class="card hidden">
+            <h1>Criar Nova Conta</h1>
+            <p style="text-align: center; color: var(--text-light); margin-bottom: 20px;">Preencha seus dados reais</p>
+            <div id="register-error" class="alert hidden">Preencha todos os campos corretamente ou CPF inválido/já existente.</div>
+            
+            <div class="form-group">
+                <label for="reg-nome">Nome Completo</label>
+                <input type="text" id="reg-nome" placeholder="Seu nome">
+            </div>
+            <div class="form-group">
+                <label for="reg-cpf">CPF Válido</label>
+                <input type="text" id="reg-cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
+            </div>
+            <div class="form-group">
+                <label for="reg-tipo">Tipo de Perfil</label>
+                <select id="reg-tipo" onchange="verificarTipoCadastro()">
+                    <option value="funcionario">Colaborador</option>
+                    <option value="admin">Gestor (Administrador)</option>
+                </select>
+            </div>
+            
+            <div class="form-group hidden" id="group-admin-pass">
+                <label for="reg-admin-pass">Senha de Segurança do Administrador</label>
+                <input type="password" id="reg-admin-pass" placeholder="Digite a senha de gestor">
+            </div>
+
+            <button onclick="cadastrarUsuario()">Cadastrar</button>
+            <button class="btn-secondary" onclick="voltarLogin()">Voltar ao Login</button>
+        </div>
+
+        <!-- MODAL DE SUCESSO DE CADASTRO -->
+        <div id="success-register-modal" class="card hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; z-index: 1000; border: 2px solid var(--success); text-align: center;">
+            <h3 style="color: var(--success);">Cadastro Realizado!</h3>
+            <p style="font-size: 14px; color: var(--text-light);">Seu código rápido de 3 dígitos gerado é:</p>
+            <div class="codigo-destaque" id="novo-codigo-gerado">---</div>
+            <p style="font-size: 12px; color: var(--text-light); margin-bottom: 20px;">Você poderá entrar tanto por este código quanto pelo seu CPF cadastrado.</p>
+            <button onclick="fecharModalSucesso()">Ir para o Login</button>
+        </div>
+
+        <!-- PAINEL DO COLABORADOR -->
+        <div id="employee-screen" class="card hidden">
+            <div class="user-info">
+                <div>
+                    <h3 id="emp-name">Nome do Funcionário</h3>
+                    <span class="badge" id="emp-badge-codigo">Código: ---</span>
                 </div>
-                
-                <div class="select-group">
-                    <label for="quantity1">Quantidade:</label>
-                    <input type="number" id="quantity1" class="quantity" min="0" value="0">
+                <button onclick="sair()" style="width: auto; padding: 8px 15px; background-color: var(--danger);">Sair</button>
+            </div>
+
+            <div class="clock-display" id="relogio">00:00:00</div>
+            <p style="text-align: center; color: var(--text-light);" id="data-atual">Data de hoje</p>
+
+            <div class="grid-buttons">
+                <button class="btn-ponto btn-entrada" onclick="baterPonto('entrada')">Registrar Entrada</button>
+                <button class="btn-ponto btn-almoco-saida" onclick="baterPonto('almoco_saida')">Saída Almoço</button>
+                <button class="btn-ponto btn-almoco-volta" onclick="baterPonto('almoco_volta')">Retorno Almoço</button>
+                <button class="btn-ponto btn-saida" onclick="baterPonto('saida')">Registrar Saída</button>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <h4>Seus Registros de Hoje</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entrada</th>
+                            <th>Saída Almoço</th>
+                            <th>Retorno Almoço</th>
+                            <th>Saída</th>
+                        </tr>
+                    </thead>
+                    <tbody id="emp-history"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PAINEL DO GESTOR -->
+        <div id="admin-screen" class="card hidden">
+            <div class="user-info">
+                <div>
+                    <h3>Painel do Gestor</h3>
+                    <span class="badge" style="background-color: #fee2e2; color: var(--danger);">Administração</span>
+                </div>
+                <button onclick="sair()" style="width: auto; padding: 8px 15px; background-color: var(--danger);">Sair</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" id="btn-tab-pontos" onclick="mudarAbaAdmin('pontos')">Controle de Pontos</button>
+                <button class="tab-btn" id="btn-tab-colab" onclick="mudarAbaAdmin('colab')">Gerenciar Colaboradores</button>
+            </div>
+
+            <div id="admin-section-pontos">
+                <p style="color: var(--text-light); margin-bottom: 15px; font-size: 14px;">Visualize, edite horários ou imprima o espelho de ponto.</p>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Funcionário</th>
+                                <th>Entrada</th>
+                                <th>S. Almoço</th>
+                                <th>R. Almoço</th>
+                                <th>Saída</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body"></tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- Calçado 2 -->
-            <div class="product">
-                <div class="product-number">#SAP-002</div>
-                <img src="https://via.placeholder.com/300x200?text=Sapato+Social" alt="Sapato Social">
-                <h3>Sapato Social</h3>
-                <p>Sapato elegante para ocasiões formais</p>
-                <p class="price">R$ 249,90</p>
-                
-                <div class="select-group">
-                    <label for="size2">Tamanho:</label>
-                    <select id="size2">
-                        <option value="">Selecione</option>
-                        <option value="37">37</option>
-                        <option value="38">38</option>
-                        <option value="39">39</option>
-                        <option value="40">40</option>
-                        <option value="41">41</option>
-                        <option value="42">42</option>
-                        <option value="43">43</option>
-                    </select>
-                </div>
-                
-                <div class="select-group">
-                    <label for="quantity2">Quantidade:</label>
-                    <input type="number" id="quantity2" class="quantity" min="0" value="0">
-                </div>
-            </div>
-
-            <!-- Calçado 3 -->
-            <div class="product">
-                <div class="product-number">#SAN-003</div>
-                <img src="https://via.placeholder.com/300x200?text=Sandália" alt="Sandália">
-                <h3>Sandália Conforto</h3>
-                <p>Sandália leve para o dia a dia</p>
-                <p class="price">R$ 129,90</p>
-                
-                <div class="select-group">
-                    <label for="size3">Tamanho:</label>
-                    <select id="size3">
-                        <option value="">Selecione</option>
-                        <option value="34">34</option>
-                        <option value="35">35</option>
-                        <option value="36">36</option>
-                        <option value="37">37</option>
-                        <option value="38">38</option>
-                        <option value="39">39</option>
-                    </select>
-                </div>
-                
-                <div class="select-group">
-                    <label for="quantity3">Quantidade:</label>
-                    <input type="number" id="quantity3" class="quantity" min="0" value="0">
-                </div>
-            </div>
-
-            <!-- Calçado 4 -->
-            <div class="product">
-                <div class="product-number">#CHI-004</div>
-                <img src="https://via.placeholder.com/300x200?text=Chinelo" alt="Chinelo">
-                <h3>Chinelo Premium</h3>
-                <p>Chinelo macio para uso diário</p>
-                <p class="price">R$ 79,90</p>
-                
-                <div class="select-group">
-                    <label for="size4">Tamanho:</label>
-                    <select id="size4">
-                        <option value="">Selecione</option>
-                        <option value="35-36">35/36</option>
-                        <option value="37-38">37/38</option>
-                        <option value="39-40">39/40</option>
-                        <option value="41-42">41/42</option>
-                        <option value="43-44">43/44</option>
-                    </select>
-                </div>
-                
-                <div class="select-group">
-                    <label for="quantity4">Quantidade:</label>
-                    <input type="number" id="quantity4" class="quantity" min="0" value="0">
+            <div id="admin-section-colab" class="hidden">
+                <p style="color: var(--text-light); margin-bottom: 15px; font-size: 14px;">Consulte códigos, edite CPFs, nomes ou remova usuários.</p>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Perfil</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-body"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <div class="cart-summary">
-            <h2>Resumo do Pedido</h2>
-            <div id="orderSummary"></div>
-            <p id="totalAmount" style="font-size: 1.2em; font-weight: bold;">Total: R$ 0,00</p>
-        </div>
-
-        <a href="#" id="whatsappBtn" class="checkout-btn">Finalizar Pedido via WhatsApp</a>
     </div>
 
-<script>
-    // Informações dos produtos
-    const products = {
-        product1: {
-            code: "TÊN-001",
-            name: "Tênis Esportivo",
-            price: 199.90,
-            sizes: ["36", "37", "38", "39", "40", "41", "42", "43", "44"]
-        },
-        product2: {
-            code: "SAP-002",
-            name: "Sapato Social",
-            price: 249.90,
-            sizes: ["37", "38", "39", "40", "41", "42", "43"]
-        },
-        product3: {
-            code: "SAN-003",
-            name: "Sandália Conforto",
-            price: 129.90,
-            sizes: ["34", "35", "36", "37", "38", "39"]
-        },
-        product4: {
-            code: "CHI-004",
-            name: "Chinelo Premium",
-            price: 79.90,
-            sizes: ["35-36", "37-38", "39-40", "41-42", "43-44"]
+    <!-- ÁREA OCULTA PARA IMPRESSÃO DE PONTO -->
+    <div id="print-area" class="hidden card" style="border: 1px solid #ccc;">
+        <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #333; padding-bottom: 15px;">
+            <h2>COMPROVANTE DE REGISTRO DE PONTO</h2>
+            <p style="font-size: 14px; color: #555;">Sistema de Ponto Eletrônico Corporativo</p>
+        </div>
+        <div style="margin-bottom: 20px; font-size: 15px; line-height: 1.6;">
+            <p><b>Colaborador(a):</b> <span id="print-nome">---</span></p>
+            <p><b>CPF:</b> <span id="print-cpf">---</span> | <b>Código de Acesso:</b> <span id="print-codigo">---</span></p>
+            <p><b>Data do Registro:</b> <span id="print-data">---</span></p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 40px;">
+            <thead>
+                <tr style="background: #eee;">
+                    <th style="border: 1px solid #333; padding: 10px;">Entrada</th>
+                    <th style="border: 1px solid #333; padding: 10px;">Saída Almoço</th>
+                    <th style="border: 1px solid #333; padding: 10px;">Retorno Almoço</th>
+                    <th style="border: 1px solid #333; padding: 10px;">Saída</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: 1px solid #333; padding: 10px; text-align: center;" id="print-h-entrada">--:--</td>
+                    <td style="border: 1px solid #333; padding: 10px; text-align: center;" id="print-h-almoco-saida">--:--</td>
+                    <td style="border: 1px solid #333; padding: 10px; text-align: center;" id="print-h-almoco-volta">--:--</td>
+                    <td style="border: 1px solid #333; padding: 10px; text-align: center;" id="print-h-saida">--:--</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="margin-top: 80px; display: flex; justify-content: space-around; text-align: center;">
+            <div style="width: 40%; border-top: 1px solid #333; padding-top: 5px;">Assinatura do Colaborador</div>
+            <div style="width: 40%; border-top: 1px solid #333; padding-top: 5px;">Assinatura do Gestor / RH</div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO DE PONTO -->
+    <div id="edit-ponto-modal" class="card hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; z-index: 1000; border: 2px solid var(--primary);">
+        <h3>Editar Horário de Ponto</h3>
+        <input type="hidden" id="edit-ponto-id">
+        <div class="form-group"><label>Entrada</label><input type="time" id="edit-entrada"></div>
+        <div class="form-group"><label>Saída Almoço</label><input type="time" id="edit-almoco-saida"></div>
+        <div class="form-group"><label>Retorno Almoço</label><input type="time" id="edit-almoco-volta"></div>
+        <div class="form-group"><label>Saída</label><input type="time" id="edit-saida"></div>
+        <button onclick="salvarEdicaoPonto()">Salvar Alterações</button>
+        <button class="btn-secondary" onclick="fecharModais()">Cancelar</button>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO DE USUÁRIO -->
+    <div id="edit-user-modal" class="card hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; z-index: 1000; border: 2px solid var(--primary);">
+        <h3>Editar Dados do Usuário</h3>
+        <input type="hidden" id="edit-user-codigo">
+        <div class="form-group"><label>Nome Completo</label><input type="text" id="edit-user-name"></div>
+        <div class="form-group"><label>CPF</label><input type="text" id="edit-user-cpf" maxlength="14" oninput="mascaraCPF(this)"></div>
+        <div class="form-group">
+            <label>Tipo de Perfil</label>
+            <select id="edit-user-tipo">
+                <option value="funcionario">Colaborador</option>
+                <option value="admin">Gestor (Administrador)</option>
+            </select>
+        </div>
+        <button onclick="salvarEdicaoUsuario()">Salvar Dados</button>
+        <button class="btn-secondary" onclick="fecharModais()">Cancelar</button>
+    </div>
+
+    <script>
+        const SENHA_MESTRE_GESTOR = "admin123";
+
+        if (!localStorage.getItem('usuarios')) {
+            localStorage.setItem('usuarios', JSON.stringify([
+                { codigo: "001", cpf: "123.456.789-09", nome: "Gestor Master", tipo: "admin" }
+            ]));
         }
-    };
+        if (!localStorage.getItem('registros')) {
+            localStorage.setItem('registros', JSON.stringify([]));
+        }
 
-    // Elementos do DOM
-    const orderSummary = document.getElementById('orderSummary');
-    const totalAmount = document.getElementById('totalAmount');
-    const whatsappBtn = document.getElementById('whatsappBtn');
+        let usuarioLogado = null;
 
-    // Atualizar resumo do pedido
-    function updateOrderSummary() {
-        let summary = '';
-        let total = 0;
-        let hasItems = false;
-        
-        for (let i = 1; i <= 4; i++) {
-            const quantityInput = document.getElementById(`quantity${i}`);
-            const sizeSelect = document.getElementById(`size${i}`);
+        function gerarCodigoUnico() {
+            let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            let codigo;
+            do {
+                codigo = Math.floor(100 + Math.random() * 900).toString();
+            } while (usuarios.some(u => u.codigo === codigo));
+            return codigo;
+        }
+
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, '');
+            if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+            let soma = 0, resto;
+            for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i-1, i)) * (11 - i);
+            resto = (soma * 10) % 11;
+            if ((resto === 10) || (resto === 11)) resto = 0;
+            if (resto !== parseInt(cpf.substring(9, 10))) return false;
+            soma = 0;
+            for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
+            resto = (soma * 10) % 11;
+            if ((resto === 10) || (resto === 11)) resto = 0;
+            if (resto !== parseInt(cpf.substring(10, 11))) return false;
+            return true;
+        }
+
+        function mascaraCPF(input) {
+            let value = input.value.replace(/\D/g, "");
+            if (value.length > 11) value = value.slice(0, 11);
+            value = value.replace(/(\d{3})(\d)/, "$1.$2");
+            value = value.replace(/(\d{3})(\d)/, "$1.$2");
+            value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            input.value = value;
+        }
+
+        function tratarInputLogin(input) {
+            let val = input.value;
+            if (val.length > 3 || val.includes('.') || val.includes('-')) {
+                mascaraCPF(input);
+            } else {
+                input.value = val.replace(/\D/g, '').slice(0, 3);
+            }
+        }
+
+        setInterval(() => {
+            const agora = new Date();
+            const elRelogio = document.getElementById('relogio');
+            const elData = document.getElementById('data-atual');
+            if(elRelogio) elRelogio.innerText = agora.toLocaleTimeString('pt-BR');
+            if(elData) elData.innerText = agora.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }, 1000);
+
+        function mostrarTelaCadastro() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('register-screen').classList.remove('hidden');
+            document.getElementById('register-error').classList.add('hidden');
+        }
+
+        function voltarLogin() {
+            document.getElementById('register-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        function verificarTipoCadastro() {
+            const tipo = document.getElementById('reg-tipo').value;
+            const grupoAdmin = document.getElementById('group-admin-pass');
+            if (tipo === 'admin') {
+                grupoAdmin.classList.remove('hidden');
+            } else {
+                grupoAdmin.classList.add('hidden');
+            }
+        }
+
+        function cadastrarUsuario() {
+            const nome = document.getElementById('reg-nome').value.trim();
+            const cpf = document.getElementById('reg-cpf').value;
+            const tipo = document.getElementById('reg-tipo').value;
+            const adminPass = document.getElementById('reg-admin-pass').value;
+            const errorDiv = document.getElementById('register-error');
+
+            if (!nome || !validarCPF(cpf)) {
+                errorDiv.innerText = "Preencha o nome e informe um CPF válido!";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (tipo === 'admin' && adminPass !== SENHA_MESTRE_GESTOR) {
+                errorDiv.innerText = "Senha de Administrador incorreta!";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            if (usuarios.some(u => u.cpf === cpf)) {
+                errorDiv.innerText = "Este CPF já está cadastrado no sistema!";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const novoCodigo = gerarCodigoUnico();
+            usuarios.push({ codigo: novoCodigo, cpf, nome, tipo });
+            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+            document.getElementById('reg-nome').value = '';
+            document.getElementById('reg-cpf').value = '';
+            document.getElementById('reg-admin-pass').value = '';
+            document.getElementById('register-screen').classList.add('hidden');
             
-            const quantity = parseInt(quantityInput.value);
-            const size = sizeSelect.value;
+            document.getElementById('novo-codigo-gerado').innerText = novoCodigo;
+            document.getElementById('success-register-modal').classList.remove('hidden');
+        }
+
+        function fecharModalSucesso() {
+            document.getElementById('success-register-modal').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        function realizarLogin() {
+            let entradaLogin = document.getElementById('acesso-login').value.trim();
+            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            const errorDiv = document.getElementById('login-error');
+
+            const user = usuarios.find(u => u.codigo === entradaLogin || u.cpf === entradaLogin);
+
+            if (user) {
+                usuarioLogado = user;
+                errorDiv.classList.add('hidden');
+                document.getElementById('acesso-login').value = '';
+                document.getElementById('login-screen').classList.add('hidden');
+
+                if (user.tipo === 'admin') {
+                    document.getElementById('admin-screen').classList.remove('hidden');
+                    carregarPainelAdmin();
+                } else {
+                    document.getElementById('employee-screen').classList.remove('hidden');
+                    document.getElementById('emp-name').innerText = user.nome;
+                    document.getElementById('emp-badge-codigo').innerText = `Código: ${user.codigo} | CPF: ${user.cpf}`;
+                    carregarHistoricoFuncionario();
+                }
+            } else {
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function sair() {
+            usuarioLogado = null;
+            document.getElementById('employee-screen').classList.add('hidden');
+            document.getElementById('admin-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        function baterPonto(tipo) {
+            const registros = JSON.parse(localStorage.getItem('registros'));
+            const hoje = new Date().toISOString().split('T')[0];
+            const horaAtual = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            let registroHoje = registros.find(r => r.codigo === usuarioLogado.codigo && r.data === hoje);
+
+            if (!registroHoje) {
+                registroHoje = {
+                    id: Date.now().toString(),
+                    codigo: usuarioLogado.codigo,
+                    nome: usuarioLogado.nome,
+                    data: hoje,
+                    entrada: "--:--",
+                    almoco_saida: "--:--",
+                    almoco_volta: "--:--",
+                    saida: "--:--"
+                };
+                registros.push(registroHoje);
+            }
+
+            if (tipo === 'entrada') registroHoje.entrada = horaAtual;
+            if (tipo === 'almoco_saida') registroHoje.almoco_saida = horaAtual;
+            if (tipo === 'almoco_volta') registroHoje.almoco_volta = horaAtual;
+            if (tipo === 'saida') registroHoje.saida = horaAtual;
+
+            localStorage.setItem('registros', JSON.stringify(registros));
+            carregarHistoricoFuncionario();
+            alert(`Ponto registrado com sucesso às ${horaAtual}`);
+        }
+
+        function carregarHistoricoFuncionario() {
+            const registros = JSON.parse(localStorage.getItem('registros'));
+            const hoje = new Date().toISOString().split('T')[0];
+            const registroHoje = registros.find(r => r.codigo === usuarioLogado.codigo && r.data === hoje);
+            const tbody = document.getElementById('emp-history');
             
-            if (quantity > 0 && size) {
-                hasItems = true;
-                const product = products[`product${i}`];
-                const subtotal = quantity * product.price;
-                
-                summary += `
-                    <div class="order-item">
-                        <h4>${product.code} - ${product.name}</h4>
-                        <p>Tamanho: ${size} | Quantidade: ${quantity}</p>
-                        <p>R$ ${product.price.toFixed(2)} x ${quantity} = <strong>R$ ${subtotal.toFixed(2)}</strong></p>
-                    </div>
-                    <hr>
+            if (registroHoje) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td>${registroHoje.entrada}</td>
+                        <td>${registroHoje.almoco_saida}</td>
+                        <td>${registroHoje.almoco_volta}</td>
+                        <td>${registroHoje.saida}</td>
+                    </tr>
                 `;
-                total += subtotal;
+            } else {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-light);">Nenhum ponto registrado hoje.</td></tr>`;
             }
         }
-        
-        orderSummary.innerHTML = hasItems ? summary : '<p>Nenhum produto selecionado</p>';
-        totalAmount.textContent = `Total: R$ ${total.toFixed(2)}`;
-        
-        // Atualizar link do WhatsApp apenas se houver itens
-        if (hasItems) {
-            updateWhatsAppLink(total);
-        } else {
-            whatsappBtn.removeAttribute('href');
-        }
-    }
 
-    // Atualizar link do WhatsApp
-    function updateWhatsAppLink(total) {
-        let message = "🛒 *PEDIDO DE CALÇADOS* 🛒\n\n";
-        message += "Cliente: [NOME DO CLIENTE]\n\n";
-        message += "--------------------------------\n";
-        message += "📋 *ITENS SELECIONADOS:*\n\n";
-        
-        for (let i = 1; i <= 4; i++) {
-            const quantity = parseInt(document.getElementById(`quantity${i}`).value);
-            const size = document.getElementById(`size${i}`).value;
+        function mudarAbaAdmin(aba) {
+            const btnPontos = document.getElementById('btn-tab-pontos');
+            const btnColab = document.getElementById('btn-tab-colab');
+            const secPontos = document.getElementById('admin-section-pontos');
+            const secColab = document.getElementById('admin-section-colab');
+
+            if (aba === 'pontos') {
+                btnPontos.classList.add('active');
+                btnColab.classList.remove('active');
+                secPontos.classList.remove('hidden');
+                secColab.classList.add('hidden');
+                carregarTabelaPontosAdmin();
+            } else {
+                btnColab.classList.add('active');
+                btnPontos.classList.remove('active');
+                secColab.classList.remove('hidden');
+                secPontos.classList.add('hidden');
+                carregarTabelaColaboradoresAdmin();
+            }
+        }
+
+        function carregarPainelAdmin() {
+            carregarTabelaPontosAdmin();
+            carregarTabelaColaboradoresAdmin();
+        }
+
+        function carregarTabelaPontosAdmin() {
+            const registros = JSON.parse(localStorage.getItem('registros'));
+            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            const tbody = document.getElementById('admin-table-body');
+            tbody.innerHTML = '';
+            registros.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+            if(registros.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-light);">Nenhum ponto registrado até o momento.</td></tr>`;
+                return;
+            }
+
+            registros.forEach(reg => {
+                const user = usuarios.find(u => u.codigo === reg.codigo) || { cpf: "Não informado" };
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${reg.data.split('-').reverse().join('/')}</td>
+                    <td><b>${reg.nome}</b></td>
+                    <td>${reg.entrada}</td>
+                    <td>${reg.almoco_saida}</td>
+                    <td>${reg.almoco_volta}</td>
+                    <td>${reg.saida}</td>
+                    <td>
+                        <button onclick="abrirEditarPonto('${reg.id}')" style="padding: 5px 8px; font-size: 11px; width: auto; margin-bottom: 3px;">Editar</button>
+                        <button onclick="imprimirPonto('${reg.id}')" style="padding: 5px 8px; font-size: 11px; width: auto; background-color: var(--success);">Imprimir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function imprimirPonto(id) {
+            const registros = JSON.parse(localStorage.getItem('registros'));
+            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            const reg = registros.find(r => r.id === id);
             
-            if (quantity > 0 && size) {
-                const product = products[`product${i}`];
-                message += `✔️ *${product.name}*\n`;
-                message += `   🔹 Código: ${product.code}\n`;
-                message += `   🔹 Tamanho: ${size}\n`;
-                message += `   🔹 Quantidade: ${quantity}\n`;
-                message += `   🔹 Valor: R$ ${(product.price * quantity).toFixed(2)}\n\n`;
+            if (reg) {
+                const user = usuarios.find(u => u.codigo === reg.codigo) || { cpf: "---" };
+
+                document.getElementById('print-nome').innerText = reg.nome;
+                document.getElementById('print-cpf').innerText = user.cpf;
+                document.getElementById('print-codigo').innerText = reg.codigo;
+                document.getElementById('print-data').innerText = reg.data.split('-').reverse().join('/');
+                document.getElementById('print-h-entrada').innerText = reg.entrada;
+                document.getElementById('print-h-almoco-saida').innerText = reg.almoco_saida;
+                document.getElementById('print-h-almoco-volta').innerText = reg.almoco_volta;
+                document.getElementById('print-h-saida').innerText = reg.saida;
+
+                // Mostra temporariamente a área de impressão para o navegador capturar e abre a janela de print
+                const printArea = document.getElementById('print-area');
+                printArea.classList.remove('hidden');
+                
+                window.print();
+
+                printArea.classList.add('hidden');
             }
         }
-        
-        message += "--------------------------------\n";
-        message += `💰 *VALOR TOTAL: R$ ${total.toFixed(2)}*\n\n`;
-        message += "📝 *OBSERVAÇÕES:* [DEIXE SUAS OBSERVAÇÕES AQUI]\n\n";
-        message += "Por favor, confirme este pedido!";
 
-        const encodedMessage = encodeURIComponent(message);
-        whatsappBtn.href = `https://wa.me/message/OX2BKJR5BY5WE1?text=${encodedMessage}`;
-    }
+        function carregarTabelaColaboradoresAdmin() {
+            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            const tbody = document.getElementById('admin-users-body');
+            tbody.innerHTML = '';
 
-    // Adicionar event listeners
-    for (let i = 1; i <= 4; i++) {
-        document.getElementById(`quantity${i}`).addEventListener('input', updateOrderSummary);
-        document.getElementById(`size${i}`).addEventListener('change', updateOrderSummary);
-    }
+            usuarios.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge" style="background:#e0e7ff; color:var(--primary); font-size:14px;">${u.codigo}</span></td>
+                    <td><b>${u.nome}</b></td>
+                    <td>${u.cpf}</td>
+                    <td><span class="badge" style="${u.tipo === 'admin' ? 'background:#fee2e2;color:#ef4444;' : ''}">${u.tipo === 'admin' ? 'Gestor' : 'Colaborador'}</span></td>
+                    <td>
+                        <button onclick="abrirEditarUsuario('${u.codigo}')" style="padding: 6px 10px; font-size: 12px; width: auto; margin-right:5px;">Editar Dados</button>
+                        <button onclick="excluirUsuario('${u.codigo}')" style="padding: 6px 10px; font-size: 12px; width: auto; background-color: var(--danger);">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
 
-    // Inicializar
-    updateOrderSummary();
-</script>
+        function abrirEditarPonto(id) {
+            const registros = JSON.parse(localStorage.getItem('registros'));
+            const reg = registros.find(r => r.id === id);
+            if (reg) {
+                document.getElementById('edit-ponto-id').value = reg.id;
+                document.getElementById('edit-entrada').value = reg.entrada !== "--:--" ? reg.entrada : "";
+                document.getElementById('edit-almoco-saida').value = reg.almoco_saida !== "--:--" ? reg.almoco_saida : "";
+                document.getElementById('edit-almoco-volta').value = reg.almoco_volta !== "--:--" ? reg.almoco_volta : "";
+                document.getElementById('edit-saida').value = reg.saida !== "--:--" ? reg.saida : "";
+                document.getElementById('edit-ponto-modal').classList.remove('hidden');
+            }
+        }
+
+        function salvarEdicaoPonto() {
+            const id = document.getElementById('edit-ponto-id').value;
+            let registros = JSON.parse(localStorage.getItem('registros'));
+            let reg = registros.find(r => r.id === id);
+
+            if (reg) {
+                reg.entrada = document.getElementById('edit-entrada').value || "--:--";
+                reg.almoco_saida = document.getElementById('edit-almoco-saida').value || "--:--";
+                reg.almoco_volta = document.getElementById('edit-almoco-volta').value || "--:--";
+                reg.saida = document.getElementById('edit-saida').value || "--:--";
+
+                localStorage.setItem('registros', JSON.stringify(registros));
+                fecharModais();
+                carregarTabelaPontosAdmin();
+                alert("Horário atualizado com sucesso!");
+            }
+        }
+
+        function abrirEditarUsuario(codigo) {
+            let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            let user = usuarios.find(u => u.codigo === codigo);
+            if (user) {
+                document.getElementById('edit-user-codigo').value = user.codigo;
+                document.getElementById('edit-user-name').value = user.nome;
+                document.getElementById('edit-user-cpf').value = user.cpf;
+                document.getElementById('edit-user-tipo').value = user.tipo;
+                document.getElementById('edit-user-modal').classList.remove('hidden');
+            }
+        }
+
+        function salvarEdicaoUsuario() {
+            const codigo = document.getElementById('edit-user-codigo').value;
+            const novoNome = document.getElementById('edit-user-name').value.trim();
+            const novoCpf = document.getElementById('edit-user-cpf').value;
+            const novoTipo = document.getElementById('edit-user-tipo').value;
+
+            if (!novoNome || !validarCPF(novoCpf)) {
+                alert("Nome inválido ou CPF incorreto/falso!");
+                return;
+            }
+
+            let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            
+            if (usuarios.some(u => u.cpf === novoCpf && u.codigo !== codigo)) {
+                alert("Este CPF já pertence a outro usuário cadastrado!");
+                return;
+            }
+
+            let user = usuarios.find(u => u.codigo === codigo);
+            if (user) {
+                user.nome = novoNome;
+                user.cpf = novoCpf;
+                user.tipo = novoTipo;
+
+                let registros = JSON.parse(localStorage.getItem('registros'));
+                registros.forEach(r => {
+                    if (r.codigo === codigo) {
+                        r.nome = novoNome;
+                    }
+                });
+                localStorage.setItem('registros', JSON.stringify(registros));
+                localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+                fecharModais();
+                carregarTabelaColaboradoresAdmin();
+                carregarTabelaPontosAdmin();
+                alert("Dados atualizados com sucesso!");
+            }
+        }
+
+        function excluirUsuario(codigo) {
+            if (confirm("Tem certeza que deseja excluir este usuário do sistema?")) {
+                let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+                
+                if (usuarios.filter(u => u.tipo === 'admin').length <= 1 && usuarios.find(u => u.codigo === codigo)?.tipo === 'admin') {
+                    alert("Você não pode excluir o único administrador ativo do sistema.");
+                    return;
+                }
+
+                usuarios = usuarios.filter(u => u.codigo !== codigo);
+                localStorage.setItem('usuarios', JSON.stringify(usuarios));
+                carregarTabelaColaboradoresAdmin();
+                alert("Usuário removido com sucesso.");
+            }
+        }
+
+        function fecharModais() {
+            document.getElementById('edit-ponto-modal').classList.add('hidden');
+            document.getElementById('edit-user-modal').classList.add('hidden');
+        }
+    </script>
 </body>
 </html>
