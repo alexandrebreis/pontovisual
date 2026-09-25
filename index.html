@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -48,14 +48,55 @@
             margin-bottom: 20px;
         }
 
-        h1, h2, h3 {
-            margin-bottom: 20px;
+        h1, h2, h3, h4 {
+            margin-bottom: 15px;
             color: var(--text);
+        }
+
+        h1, h2 {
             text-align: center;
         }
 
         .form-group {
             margin-bottom: 15px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: #f3f4f6;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .summary-card span {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .summary-card label {
+            font-size: 11px;
+            margin-bottom: 0;
         }
 
         label {
@@ -68,10 +109,10 @@
 
         input, select {
             width: 100%;
-            padding: 12px;
+            padding: 10px 12px;
             border: 1px solid var(--border);
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             outline: none;
             transition: border-color 0.2s;
         }
@@ -87,7 +128,7 @@
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s;
@@ -121,7 +162,6 @@
             text-decoration: underline;
         }
 
-        /* Painel de Ponto */
         .clock-display {
             font-size: 2.5rem;
             font-weight: bold;
@@ -155,7 +195,6 @@
 
         .btn-ponto:hover { opacity: 0.9; }
 
-        /* Tabelas */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -164,7 +203,7 @@
         }
 
         th, td {
-            padding: 12px;
+            padding: 10px;
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
@@ -172,6 +211,14 @@
         th {
             background-color: #f9fafb;
             font-weight: 600;
+        }
+
+        .badge-falta {
+            color: var(--danger);
+            font-weight: bold;
+            background-color: #fee2e2;
+            padding: 2px 6px;
+            border-radius: 4px;
         }
 
         .user-info {
@@ -235,7 +282,6 @@
             letter-spacing: 5px;
         }
 
-        /* Estilo específico para impressão */
         @media print {
             body * {
                 visibility: hidden;
@@ -362,17 +408,56 @@
             </div>
 
             <div class="tabs">
-                <button class="tab-btn active" id="btn-tab-pontos" onclick="mudarAbaAdmin('pontos')">Controle de Pontos</button>
+                <button class="tab-btn active" id="btn-tab-pontos" onclick="mudarAbaAdmin('pontos')">Folha de Ponto por Período</button>
                 <button class="tab-btn" id="btn-tab-colab" onclick="mudarAbaAdmin('colab')">Gerenciar Colaboradores</button>
             </div>
 
+            <!-- CONTROLE DE PONTOS POR FILTRO E PERÍODO -->
             <div id="admin-section-pontos">
-                <p style="color: var(--text-light); margin-bottom: 15px; font-size: 14px;">Visualize, edite horários ou imprima o espelho de ponto.</p>
+                <div class="filter-grid">
+                    <div>
+                        <label for="filter-colaborador">Colaborador</label>
+                        <select id="filter-colaborador" onchange="carregarTabelaPontosAdmin()"></select>
+                    </div>
+                    <div>
+                        <label for="filter-data-inicio">Data Inicial</label>
+                        <input type="date" id="filter-data-inicio" onchange="carregarTabelaPontosAdmin()">
+                    </div>
+                    <div>
+                        <label for="filter-data-fim">Data Final</label>
+                        <input type="date" id="filter-data-fim" onchange="carregarTabelaPontosAdmin()">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button onclick="imprimirFolhaPontoPeriodo()" style="background-color: var(--success); height: 42px;">Imprimir Folha de Ponto</button>
+                    </div>
+                </div>
+
+                <!-- RESUMO DE DIAS TRABALHADOS E OCORRÊNCIAS -->
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <label>Dias Trabalhados</label>
+                        <span id="sum-trabalhados">0</span>
+                    </div>
+                    <div class="summary-card">
+                        <label>Faltas</label>
+                        <span id="sum-faltas" style="color: var(--danger);">0</span>
+                    </div>
+                    <div class="summary-card">
+                        <label>Férias / Licenças</label>
+                        <span id="sum-afastamentos" style="color: var(--warning);">0</span>
+                    </div>
+                    <div class="summary-card">
+                        <label>Feriados / Folgas</label>
+                        <span id="sum-feriados" style="color: #3b82f6;">0</span>
+                    </div>
+                </div>
+
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
                             <tr>
                                 <th>Data</th>
+                                <th>Dia</th>
                                 <th>Funcionário</th>
                                 <th>Entrada</th>
                                 <th>S. Almoço</th>
@@ -407,49 +492,74 @@
 
     </div>
 
-    <!-- ÁREA OCULTA PARA IMPRESSÃO DE PONTO -->
-    <div id="print-area" class="hidden card" style="border: 1px solid #ccc;">
-        <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #333; padding-bottom: 15px;">
-            <h2>COMPROVANTE DE REGISTRO DE PONTO</h2>
-            <p style="font-size: 14px; color: #555;">Sistema de Ponto Eletrônico Corporativo</p>
+    <!-- ÁREA OCULTA PARA IMPRESSÃO DA FOLHA DE PONTO DE PERÍODO -->
+    <div id="print-area" class="hidden card">
+        <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
+            <h2 style="margin-bottom: 5px;">FOLHA DE PONTO DE FREQUÊNCIA</h2>
+            <p style="font-size: 13px; color: #555;">Registro Individual de Ponto e Ausências</p>
         </div>
-        <div style="margin-bottom: 20px; font-size: 15px; line-height: 1.6;">
-            <p><b>Colaborador(a):</b> <span id="print-nome">---</span></p>
-            <p><b>CPF:</b> <span id="print-cpf">---</span> | <b>Código de Acesso:</b> <span id="print-codigo">---</span></p>
-            <p><b>Data do Registro:</b> <span id="print-data">---</span></p>
+        
+        <div style="margin-bottom: 15px; font-size: 14px; line-height: 1.5; display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">
+            <div>
+                <p><b>Colaborador:</b> <span id="print-nome">---</span></p>
+                <p><b>CPF:</b> <span id="print-cpf">---</span> | <b>Código:</b> <span id="print-codigo">---</span></p>
+            </div>
+            <div style="text-align: right;">
+                <p><b>Período:</b> <span id="print-periodo">---</span></p>
+                <p><b>Dias Trabalhados:</b> <span id="print-dias-trabalhados">0</span></p>
+                <p><b>Emissão:</b> <span id="print-emissao">---</span></p>
+            </div>
         </div>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 40px;">
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 30px; font-size: 12px;">
             <thead>
-                <tr style="background: #eee;">
-                    <th style="border: 1px solid #333; padding: 10px;">Entrada</th>
-                    <th style="border: 1px solid #333; padding: 10px;">Saída Almoço</th>
-                    <th style="border: 1px solid #333; padding: 10px;">Retorno Almoço</th>
-                    <th style="border: 1px solid #333; padding: 10px;">Saída</th>
+                <tr style="background: #f2f2f2;">
+                    <th style="border: 1px solid #333; padding: 6px; text-align: center;">Data</th>
+                    <th style="border: 1px solid #333; padding: 6px; text-align: center;">Dia</th>
+                    <th style="border: 1px solid #333; padding: 6px; text-align: center;">Entrada</th>
+                    <th style="border: 1px solid #333; padding: 6px; text-align: center;">S. Almoço</th>
+                    <th style="border: 1px solid #333; padding: 6px; text-align: center;">R. Almoço</th>
+                    <th style="border: 1px solid #333; padding: 6px; text-align: center;">Saída</th>
+                    <th style="border: 1px solid #333; padding: 6px; text-align: center;">Assinatura / Observação</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td style="border: 1px solid #333; padding: 10px; text-align: center;" id="print-h-entrada">--:--</td>
-                    <td style="border: 1px solid #333; padding: 10px; text-align: center;" id="print-h-almoco-saida">--:--</td>
-                    <td style="border: 1px solid #333; padding: 10px; text-align: center;" id="print-h-almoco-volta">--:--</td>
-                    <td style="border: 1px solid #333; padding: 10px; text-align: center;" id="print-h-saida">--:--</td>
-                </tr>
+            <tbody id="print-table-body">
             </tbody>
         </table>
-        <div style="margin-top: 80px; display: flex; justify-content: space-around; text-align: center;">
+
+        <div style="margin-top: 60px; display: flex; justify-content: space-around; text-align: center; font-size: 13px;">
             <div style="width: 40%; border-top: 1px solid #333; padding-top: 5px;">Assinatura do Colaborador</div>
             <div style="width: 40%; border-top: 1px solid #333; padding-top: 5px;">Assinatura do Gestor / RH</div>
         </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO DE PONTO -->
+    <!-- MODAL DE EDIÇÃO / REGISTRO DE PONTO E FALTA -->
     <div id="edit-ponto-modal" class="card hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; z-index: 1000; border: 2px solid var(--primary);">
-        <h3>Editar Horário de Ponto</h3>
-        <input type="hidden" id="edit-ponto-id">
-        <div class="form-group"><label>Entrada</label><input type="time" id="edit-entrada"></div>
-        <div class="form-group"><label>Saída Almoço</label><input type="time" id="edit-almoco-saida"></div>
-        <div class="form-group"><label>Retorno Almoço</label><input type="time" id="edit-almoco-volta"></div>
-        <div class="form-group"><label>Saída</label><input type="time" id="edit-saida"></div>
+        <h3>Editar Horário / Afastamento</h3>
+        <input type="hidden" id="edit-ponto-codigo">
+        <input type="hidden" id="edit-ponto-data">
+        <p id="edit-ponto-info" style="font-size:13px; color:var(--text-light); margin-bottom:15px;"></p>
+        
+        <div class="form-group">
+            <label>Motivo / Ocorrência</label>
+            <select id="edit-motivo" onchange="alternarCamposHorario()">
+                <option value="">Trabalho Normal (Horários)</option>
+                <option value="Férias">Férias</option>
+                <option value="Falta Justificada">Falta Justificada</option>
+                <option value="Atestado Médico">Atestado Médico</option>
+                <option value="Licença">Licença Maternidade/Paternidade</option>
+                <option value="Feriado">Feriado</option>
+                <option value="Folga">Folga</option>
+            </select>
+        </div>
+
+        <div id="grupo-horarios">
+            <div class="form-group"><label>Entrada</label><input type="time" id="edit-entrada"></div>
+            <div class="form-group"><label>Saída Almoço</label><input type="time" id="edit-almoco-saida"></div>
+            <div class="form-group"><label>Retorno Almoço</label><input type="time" id="edit-almoco-volta"></div>
+            <div class="form-group"><label>Saída</label><input type="time" id="edit-saida"></div>
+        </div>
+
         <button onclick="salvarEdicaoPonto()">Salvar Alterações</button>
         <button class="btn-secondary" onclick="fecharModais()">Cancelar</button>
     </div>
@@ -473,6 +583,23 @@
 
     <script>
         const SENHA_MESTRE_GESTOR = "admin123";
+
+        // FERIADOS NACIONAIS PRÉ-DEFINIDOS (Ano Mês Dia)
+        const FERIADOS_PREDEFINIDOS = [
+            "-01-01", // Confraternização Universal
+            "-04-21", // Tiradentes
+            "-05-01", // Dia do Trabalho
+            "-09-07", // Independência do Brasil
+            "-10-12", // Nossa Senhora Aparecida
+            "-11-02", // Finados
+            "-11-15", // Proclamação da República
+            "-11-20", // Consciência Negra
+            "-12-25"  // Natal
+        ];
+
+        function eFeriadoPredefinido(dataISO) {
+            return FERIADOS_PREDEFINIDOS.some(f => dataISO.endsWith(f));
+        }
 
         if (!localStorage.getItem('usuarios')) {
             localStorage.setItem('usuarios', JSON.stringify([
@@ -616,6 +743,7 @@
 
                 if (user.tipo === 'admin') {
                     document.getElementById('admin-screen').classList.remove('hidden');
+                    inicializarFiltrosAdmin();
                     carregarPainelAdmin();
                 } else {
                     document.getElementById('employee-screen').classList.remove('hidden');
@@ -648,6 +776,7 @@
                     codigo: usuarioLogado.codigo,
                     nome: usuarioLogado.nome,
                     data: hoje,
+                    motivo: eFeriadoPredefinido(hoje) ? "Feriado" : "",
                     entrada: "--:--",
                     almoco_saida: "--:--",
                     almoco_volta: "--:--",
@@ -671,19 +800,43 @@
             const hoje = new Date().toISOString().split('T')[0];
             const registroHoje = registros.find(r => r.codigo === usuarioLogado.codigo && r.data === hoje);
             const tbody = document.getElementById('emp-history');
+
+            const motivoEfetivo = (registroHoje && registroHoje.motivo) ? registroHoje.motivo : (eFeriadoPredefinido(hoje) ? "Feriado Nacional" : "");
             
-            if (registroHoje) {
+            if (registroHoje && motivoEfetivo) {
                 tbody.innerHTML = `
                     <tr>
-                        <td>${registroHoje.entrada}</td>
-                        <td>${registroHoje.almoco_saida}</td>
-                        <td>${registroHoje.almoco_volta}</td>
-                        <td>${registroHoje.saida}</td>
+                        <td colspan="4" style="text-align: center; font-weight: bold; color: var(--primary); background-color: #e0e7ff;">
+                            ${motivoEfetivo.toUpperCase()}
+                        </td>
                     </tr>
                 `;
+            } else if (registroHoje) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td>${formatarBatida(registroHoje.entrada, hoje)}</td>
+                        <td>${formatarBatida(registroHoje.almoco_saida, hoje)}</td>
+                        <td>${formatarBatida(registroHoje.almoco_volta, hoje)}</td>
+                        <td>${formatarBatida(registroHoje.saida, hoje)}</td>
+                    </tr>
+                `;
+            } else if (eFeriadoPredefinido(hoje)) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; font-weight: bold; color: var(--primary); background-color: #e0e7ff;">FERIADO NACIONAL</td></tr>`;
             } else {
                 tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-light);">Nenhum ponto registrado hoje.</td></tr>`;
             }
+        }
+
+        function formatarBatida(valor, dataRegistro) {
+            const hoje = new Date().toISOString().split('T')[0];
+            
+            if (!valor || valor === "--:--") {
+                if (dataRegistro < hoje) {
+                    return `<span class="badge-falta">FALTA</span>`;
+                }
+                return `--:--`;
+            }
+            return valor;
         }
 
         function mudarAbaAdmin(aba) {
@@ -707,9 +860,39 @@
             }
         }
 
+        function inicializarFiltrosAdmin() {
+            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            const selectColab = document.getElementById('filter-colaborador');
+            selectColab.innerHTML = '<option value="todos">Todos os Colaboradores</option>';
+
+            usuarios.forEach(u => {
+                selectColab.innerHTML += `<option value="${u.codigo}">${u.nome} (Cód: ${u.codigo})</option>`;
+            });
+
+            const hoje = new Date();
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const ultimoDia = new Date(ano, hoje.getMonth() + 1, 0).getDate();
+
+            document.getElementById('filter-data-inicio').value = `${ano}-${mes}-01`;
+            document.getElementById('filter-data-fim').value = `${ano}-${mes}-${String(ultimoDia).padStart(2, '0')}`;
+        }
+
         function carregarPainelAdmin() {
             carregarTabelaPontosAdmin();
             carregarTabelaColaboradoresAdmin();
+        }
+
+        function obterListaDatasPeriodo(dataInicioStr, dataFimStr) {
+            const lista = [];
+            let atual = new Date(dataInicioStr + 'T00:00:00');
+            const fim = new Date(dataFimStr + 'T00:00:00');
+
+            while (atual <= fim) {
+                lista.push(atual.toISOString().split('T')[0]);
+                atual.setDate(atual.getDate() + 1);
+            }
+            return lista;
         }
 
         function carregarTabelaPontosAdmin() {
@@ -717,57 +900,274 @@
             const usuarios = JSON.parse(localStorage.getItem('usuarios'));
             const tbody = document.getElementById('admin-table-body');
             tbody.innerHTML = '';
-            registros.sort((a, b) => new Date(b.data) - new Date(a.data));
 
-            if(registros.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-light);">Nenhum ponto registrado até o momento.</td></tr>`;
+            const codColab = document.getElementById('filter-colaborador').value;
+            const dataInicio = document.getElementById('filter-data-inicio').value;
+            const dataFim = document.getElementById('filter-data-fim').value;
+
+            if (!dataInicio || !dataFim) return;
+
+            let colabsFiltrados = usuarios;
+            if (codColab !== 'todos') {
+                colabsFiltrados = usuarios.filter(u => u.codigo === codColab);
+            }
+
+            const periodoDatas = obterListaDatasPeriodo(dataInicio, dataFim);
+            const linhasTabela = [];
+
+            let totalTrabalhados = 0;
+            let totalFaltas = 0;
+            let totalAfastamentos = 0;
+            let totalFeriados = 0;
+
+            const hojeStr = new Date().toISOString().split('T')[0];
+
+            colabsFiltrados.forEach(colab => {
+                periodoDatas.forEach(data => {
+                    const reg = registros.find(r => r.codigo === colab.codigo && r.data === data);
+                    const dataObj = new Date(data + 'T00:00:00');
+                    const diaSemana = dataObj.toLocaleDateString('pt-BR', { weekday: 'short' });
+
+                    let motivoEfetivo = reg ? reg.motivo : "";
+                    if (!motivoEfetivo && eFeriadoPredefinido(data)) {
+                        motivoEfetivo = "Feriado";
+                    }
+
+                    // Cálculo dos totais
+                    const teveEntrada = reg && reg.entrada && reg.entrada !== "--:--";
+                    if (teveEntrada) {
+                        totalTrabalhados++;
+                    } else if (motivoEfetivo) {
+                        if (motivoEfetivo === "Feriado" || motivoEfetivo === "Folga") {
+                            totalFeriados++;
+                        } else {
+                            totalAfastamentos++;
+                        }
+                    } else if (data < hojeStr) {
+                        totalFaltas++;
+                    }
+
+                    linhasTabela.push({
+                        codigo: colab.codigo,
+                        nome: colab.nome,
+                        data: data,
+                        diaSemana: diaSemana,
+                        motivo: motivoEfetivo,
+                        entrada: reg ? reg.entrada : "--:--",
+                        almoco_saida: reg ? reg.almoco_saida : "--:--",
+                        almoco_volta: reg ? reg.almoco_volta : "--:--",
+                        saida: reg ? reg.saida : "--:--"
+                    });
+                });
+            });
+
+            // Atualiza os contadores na tela
+            document.getElementById('sum-trabalhados').innerText = totalTrabalhados;
+            document.getElementById('sum-faltas').innerText = totalFaltas;
+            document.getElementById('sum-afastamentos').innerText = totalAfastamentos;
+            document.getElementById('sum-feriados').innerText = totalFeriados;
+
+            linhasTabela.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+            if (linhasTabela.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-light);">Nenhum registro encontrado no período.</td></tr>`;
                 return;
             }
 
-            registros.forEach(reg => {
-                const user = usuarios.find(u => u.codigo === reg.codigo) || { cpf: "Não informado" };
+            linhasTabela.forEach(item => {
                 const tr = document.createElement('tr');
+                
+                let conteudoPonto = `
+                    <td>${formatarBatida(item.entrada, item.data)}</td>
+                    <td>${formatarBatida(item.almoco_saida, item.data)}</td>
+                    <td>${formatarBatida(item.almoco_volta, item.data)}</td>
+                    <td>${formatarBatida(item.saida, item.data)}</td>
+                `;
+
+                if (item.motivo && item.motivo !== "") {
+                    conteudoPonto = `<td colspan="4" style="text-align:center; font-weight:bold; color: var(--primary); background-color: #e0e7ff;">${item.motivo.toUpperCase()}</td>`;
+                }
+
                 tr.innerHTML = `
-                    <td>${reg.data.split('-').reverse().join('/')}</td>
-                    <td><b>${reg.nome}</b></td>
-                    <td>${reg.entrada}</td>
-                    <td>${reg.almoco_saida}</td>
-                    <td>${reg.almoco_volta}</td>
-                    <td>${reg.saida}</td>
+                    <td>${item.data.split('-').reverse().join('/')}</td>
+                    <td style="text-transform: capitalize;">${item.diaSemana}</td>
+                    <td><b>${item.nome}</b></td>
+                    ${conteudoPonto}
                     <td>
-                        <button onclick="abrirEditarPonto('${reg.id}')" style="padding: 5px 8px; font-size: 11px; width: auto; margin-bottom: 3px;">Editar</button>
-                        <button onclick="imprimirPonto('${reg.id}')" style="padding: 5px 8px; font-size: 11px; width: auto; background-color: var(--success);">Imprimir</button>
+                        <button onclick="abrirEditarPonto('${item.codigo}', '${item.data}')" style="padding: 5px 8px; font-size: 11px; width: auto;">Editar</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function imprimirPonto(id) {
+        function alternarCamposHorario() {
+            const motivo = document.getElementById('edit-motivo').value;
+            const grupoHorarios = document.getElementById('grupo-horarios');
+            
+            if (motivo !== "") {
+                grupoHorarios.classList.add('hidden');
+            } else {
+                grupoHorarios.classList.remove('hidden');
+            }
+        }
+
+        function abrirEditarPonto(codigo, data) {
             const registros = JSON.parse(localStorage.getItem('registros'));
             const usuarios = JSON.parse(localStorage.getItem('usuarios'));
-            const reg = registros.find(r => r.id === id);
-            
-            if (reg) {
-                const user = usuarios.find(u => u.codigo === reg.codigo) || { cpf: "---" };
+            const user = usuarios.find(u => u.codigo === codigo);
+            const reg = registros.find(r => r.codigo === codigo && r.data === data);
 
-                document.getElementById('print-nome').innerText = reg.nome;
-                document.getElementById('print-cpf').innerText = user.cpf;
-                document.getElementById('print-codigo').innerText = reg.codigo;
-                document.getElementById('print-data').innerText = reg.data.split('-').reverse().join('/');
-                document.getElementById('print-h-entrada').innerText = reg.entrada;
-                document.getElementById('print-h-almoco-saida').innerText = reg.almoco_saida;
-                document.getElementById('print-h-almoco-volta').innerText = reg.almoco_volta;
-                document.getElementById('print-h-saida').innerText = reg.saida;
+            document.getElementById('edit-ponto-codigo').value = codigo;
+            document.getElementById('edit-ponto-data').value = data;
+            document.getElementById('edit-ponto-info').innerText = `Colaborador: ${user ? user.nome : codigo} | Data: ${data.split('-').reverse().join('/')}`;
 
-                // Mostra temporariamente a área de impressão para o navegador capturar e abre a janela de print
-                const printArea = document.getElementById('print-area');
-                printArea.classList.remove('hidden');
-                
-                window.print();
-
-                printArea.classList.add('hidden');
+            let motivoExistente = reg && reg.motivo ? reg.motivo : "";
+            if (!motivoExistente && eFeriadoPredefinido(data)) {
+                motivoExistente = "Feriado";
             }
+
+            document.getElementById('edit-motivo').value = motivoExistente;
+            document.getElementById('edit-entrada').value = (reg && reg.entrada !== "--:--") ? reg.entrada : "";
+            document.getElementById('edit-almoco-saida').value = (reg && reg.almoco_saida !== "--:--") ? reg.almoco_saida : "";
+            document.getElementById('edit-almoco-volta').value = (reg && reg.almoco_volta !== "--:--") ? reg.almoco_volta : "";
+            document.getElementById('edit-saida').value = (reg && reg.saida !== "--:--") ? reg.saida : "";
+            
+            alternarCamposHorario();
+            document.getElementById('edit-ponto-modal').classList.remove('hidden');
+        }
+
+        function salvarEdicaoPonto() {
+            const codigo = document.getElementById('edit-ponto-codigo').value;
+            const data = document.getElementById('edit-ponto-data').value;
+            const motivo = document.getElementById('edit-motivo').value;
+            let registros = JSON.parse(localStorage.getItem('registros'));
+            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            const user = usuarios.find(u => u.codigo === codigo);
+
+            let reg = registros.find(r => r.codigo === codigo && r.data === data);
+
+            if (!reg) {
+                reg = {
+                    id: Date.now().toString(),
+                    codigo: codigo,
+                    nome: user ? user.nome : 'N/A',
+                    data: data,
+                    motivo: "",
+                    entrada: "--:--",
+                    almoco_saida: "--:--",
+                    almoco_volta: "--:--",
+                    saida: "--:--"
+                };
+                registros.push(reg);
+            }
+
+            reg.motivo = motivo;
+
+            if (motivo !== "") {
+                reg.entrada = "--:--";
+                reg.almoco_saida = "--:--";
+                reg.almoco_volta = "--:--";
+                reg.saida = "--:--";
+            } else {
+                reg.entrada = document.getElementById('edit-entrada').value || "--:--";
+                reg.almoco_saida = document.getElementById('edit-almoco-saida').value || "--:--";
+                reg.almoco_volta = document.getElementById('edit-almoco-volta').value || "--:--";
+                reg.saida = document.getElementById('edit-saida').value || "--:--";
+            }
+
+            localStorage.setItem('registros', JSON.stringify(registros));
+            fecharModais();
+            carregarTabelaPontosAdmin();
+            alert("Registro atualizado com sucesso!");
+        }
+
+        function imprimirFolhaPontoPeriodo() {
+            const codColab = document.getElementById('filter-colaborador').value;
+            const dataInicio = document.getElementById('filter-data-inicio').value;
+            const dataFim = document.getElementById('filter-data-fim').value;
+
+            if (codColab === 'todos') {
+                alert("Por favor, selecione um Colaborador específico para imprimir a folha de ponto por período.");
+                return;
+            }
+
+            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            const registros = JSON.parse(localStorage.getItem('registros'));
+            const user = usuarios.find(u => u.codigo === codColab);
+
+            if (!user) return;
+
+            document.getElementById('print-nome').innerText = user.nome;
+            document.getElementById('print-cpf').innerText = user.cpf;
+            document.getElementById('print-codigo').innerText = user.codigo;
+            document.getElementById('print-periodo').innerText = `${dataInicio.split('-').reverse().join('/')} até ${dataFim.split('-').reverse().join('/')}`;
+            document.getElementById('print-emissao').innerText = new Date().toLocaleDateString('pt-BR');
+
+            const printTbody = document.getElementById('print-table-body');
+            printTbody.innerHTML = '';
+
+            const periodoDatas = obterListaDatasPeriodo(dataInicio, dataFim);
+            const hoje = new Date().toISOString().split('T')[0];
+
+            let diasTrabalhadosImpressao = 0;
+
+            periodoDatas.forEach(data => {
+                const reg = registros.find(r => r.codigo === user.codigo && r.data === data);
+                const dataObj = new Date(data + 'T00:00:00');
+                const diaSemana = dataObj.toLocaleDateString('pt-BR', { weekday: 'short' });
+
+                let motivoEfetivo = reg ? reg.motivo : "";
+                if (!motivoEfetivo && eFeriadoPredefinido(data)) {
+                    motivoEfetivo = "Feriado";
+                }
+
+                if (reg && reg.entrada && reg.entrada !== "--:--") {
+                    diasTrabalhadosImpressao++;
+                }
+
+                const tr = document.createElement('tr');
+
+                if (motivoEfetivo && motivoEfetivo !== "") {
+                    tr.innerHTML = `
+                        <td style="border: 1px solid #333; padding: 6px; text-align: center;">${data.split('-').reverse().join('/')}</td>
+                        <td style="border: 1px solid #333; padding: 6px; text-align: center; text-transform: capitalize;">${diaSemana}</td>
+                        <td colspan="4" style="border: 1px solid #333; padding: 6px; text-align: center; font-weight: bold; background: #f0f0f0;">${motivoEfetivo.toUpperCase()}</td>
+                        <td style="border: 1px solid #333; padding: 6px;"></td>
+                    `;
+                } else {
+                    const obterTextoFormatado = (valor) => {
+                        if (!valor || valor === "--:--") {
+                            return data < hoje ? "FALTA" : "--:--";
+                        }
+                        return valor;
+                    };
+
+                    const entradaStr = obterTextoFormatado(reg ? reg.entrada : null);
+                    const almocoSaidaStr = obterTextoFormatado(reg ? reg.almoco_saida : null);
+                    const almocoVoltaStr = obterTextoFormatado(reg ? reg.almoco_volta : null);
+                    const saidaStr = obterTextoFormatado(reg ? reg.saida : null);
+
+                    tr.innerHTML = `
+                        <td style="border: 1px solid #333; padding: 6px; text-align: center;">${data.split('-').reverse().join('/')}</td>
+                        <td style="border: 1px solid #333; padding: 6px; text-align: center; text-transform: capitalize;">${diaSemana}</td>
+                        <td style="border: 1px solid #333; padding: 6px; text-align: center; ${entradaStr === 'FALTA' ? 'color: red; font-weight:bold;' : ''}">${entradaStr}</td>
+                        <td style="border: 1px solid #333; padding: 6px; text-align: center; ${almocoSaidaStr === 'FALTA' ? 'color: red; font-weight:bold;' : ''}">${almocoSaidaStr}</td>
+                        <td style="border: 1px solid #333; padding: 6px; text-align: center; ${almocoVoltaStr === 'FALTA' ? 'color: red; font-weight:bold;' : ''}">${almocoVoltaStr}</td>
+                        <td style="border: 1px solid #333; padding: 6px; text-align: center; ${saidaStr === 'FALTA' ? 'color: red; font-weight:bold;' : ''}">${saidaStr}</td>
+                        <td style="border: 1px solid #333; padding: 6px;"></td>
+                    `;
+                }
+
+                printTbody.appendChild(tr);
+            });
+
+            document.getElementById('print-dias-trabalhados').innerText = diasTrabalhadosImpressao;
+
+            const printArea = document.getElementById('print-area');
+            printArea.classList.remove('hidden');
+            window.print();
+            printArea.classList.add('hidden');
         }
 
         function carregarTabelaColaboradoresAdmin() {
@@ -789,37 +1189,6 @@
                 `;
                 tbody.appendChild(tr);
             });
-        }
-
-        function abrirEditarPonto(id) {
-            const registros = JSON.parse(localStorage.getItem('registros'));
-            const reg = registros.find(r => r.id === id);
-            if (reg) {
-                document.getElementById('edit-ponto-id').value = reg.id;
-                document.getElementById('edit-entrada').value = reg.entrada !== "--:--" ? reg.entrada : "";
-                document.getElementById('edit-almoco-saida').value = reg.almoco_saida !== "--:--" ? reg.almoco_saida : "";
-                document.getElementById('edit-almoco-volta').value = reg.almoco_volta !== "--:--" ? reg.almoco_volta : "";
-                document.getElementById('edit-saida').value = reg.saida !== "--:--" ? reg.saida : "";
-                document.getElementById('edit-ponto-modal').classList.remove('hidden');
-            }
-        }
-
-        function salvarEdicaoPonto() {
-            const id = document.getElementById('edit-ponto-id').value;
-            let registros = JSON.parse(localStorage.getItem('registros'));
-            let reg = registros.find(r => r.id === id);
-
-            if (reg) {
-                reg.entrada = document.getElementById('edit-entrada').value || "--:--";
-                reg.almoco_saida = document.getElementById('edit-almoco-saida').value || "--:--";
-                reg.almoco_volta = document.getElementById('edit-almoco-volta').value || "--:--";
-                reg.saida = document.getElementById('edit-saida').value || "--:--";
-
-                localStorage.setItem('registros', JSON.stringify(registros));
-                fecharModais();
-                carregarTabelaPontosAdmin();
-                alert("Horário atualizado com sucesso!");
-            }
         }
 
         function abrirEditarUsuario(codigo) {
@@ -868,6 +1237,7 @@
                 localStorage.setItem('usuarios', JSON.stringify(usuarios));
 
                 fecharModais();
+                inicializarFiltrosAdmin();
                 carregarTabelaColaboradoresAdmin();
                 carregarTabelaPontosAdmin();
                 alert("Dados atualizados com sucesso!");
@@ -885,7 +1255,9 @@
 
                 usuarios = usuarios.filter(u => u.codigo !== codigo);
                 localStorage.setItem('usuarios', JSON.stringify(usuarios));
+                inicializarFiltrosAdmin();
                 carregarTabelaColaboradoresAdmin();
+                carregarTabelaPontosAdmin();
                 alert("Usuário removido com sucesso.");
             }
         }
